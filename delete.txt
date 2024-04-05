@@ -1,0 +1,7 @@
+likes
+dislikes
+uid
+caption
+visibility (public/private)
+imp (true/false)
+images (an array of images)
