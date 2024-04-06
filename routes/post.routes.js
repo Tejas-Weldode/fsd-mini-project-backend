@@ -72,7 +72,7 @@ router.get("/public-posts", auth, async (req, res) => {
             _id: req.userId,
             onlySeeImp: true,
         });
-        const posts = null;
+        let posts = null;
 
         if (onlySeeImp)
             posts = await Post.find({ imp: true }).populate("images");
