@@ -40,7 +40,7 @@ router.post("/create", auth, async (req, res) => {
 });
 
 // Get posts route
-router.get("/following-posts", async (req, res) => {
+router.get("/following-posts", auth, async (req, res) => {
     try {
         // if user wants only important posts
         const onlySeeImp = await User.find({
@@ -65,7 +65,7 @@ router.get("/following-posts", async (req, res) => {
 });
 
 // Get posts route
-router.get("/public-posts", async (req, res) => {
+router.get("/public-posts", auth, async (req, res) => {
     try {
         // if user wants only important posts
         const onlySeeImp = await User.find({

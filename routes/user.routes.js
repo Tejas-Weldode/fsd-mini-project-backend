@@ -56,7 +56,6 @@ router.put("/edit-profile", auth, async (req, res) => {
             notifyMessages,
             onlySeeImp,
         } = req.body;
-        // Assuming you are authenticated and have the user's ID from the token
         const userId = req.userId;
         await User.findByIdAndUpdate(userId, {
             bio,
