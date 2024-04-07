@@ -68,13 +68,13 @@ router.get("/following-posts", auth, async (req, res) => {
 router.get("/public-posts", auth, async (req, res) => {
     try {
         // if user wants only important posts
-        const onlySeeImp = await User.find({
+        const user = await User.find({
             _id: req.userId,
             onlySeeImp: true,
         });
         let posts = null;
 
-        if (onlySeeImp)
+        if (user.onlySeeImp)
             posts = await Post.find({ imp: true }).populate("images");
         else posts = await Post.find().populate("images");
         res.status(200).json(posts);
