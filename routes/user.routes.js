@@ -6,6 +6,16 @@ import auth from "../middlewares/auth.js";
 
 const router = express.Router();
 
+// get all users
+router.get("/get", async (req, res) => {
+    try {
+        const users = await User.find();
+        res.status(200).json({ users });
+    } catch (error) {
+        res.status(400).json({ message: error.message });
+    }
+});
+
 // Signup route
 router.post("/signup", async (req, res) => {
     try {

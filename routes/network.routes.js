@@ -7,8 +7,8 @@ const router = express.Router();
 // Follow user route
 router.post("/follow", auth, async (req, res) => {
     try {
-        const { follower } = req.body;
-        const uid = req.body.userId;
+        const { uid } = req.body;
+        const follower = req.userId;
         const existingNetwork = await Network.findOne({ uid, follower });
         if (existingNetwork) {
             return res
@@ -26,8 +26,8 @@ router.post("/follow", auth, async (req, res) => {
 // Unfollow user route
 router.delete("/unfollow", auth, async (req, res) => {
     try {
-        const { follower } = req.body;
-        const uid = req.body.userId;
+        const { uid } = req.body;
+        const follower = req.userId;
         const network = await Network.findOneAndDelete({ uid, follower });
         if (!network) {
             return res
@@ -62,10 +62,11 @@ router.get("/followers", auth, async (req, res) => {
 router.get("/following", auth, async (req, res) => {
     try {
         const following = await Network.find({
-            follower: req.body.userId,
+            follower: req.userId,
         }).populate("uid", "username profilePic fullName");
         res.status(200).json(
             following.map((user) => ({
+                _id: user.uid._id,
                 username: user.uid.username,
                 profilePic: user.uid.profilePic,
                 fullName: user.uid.fullName,

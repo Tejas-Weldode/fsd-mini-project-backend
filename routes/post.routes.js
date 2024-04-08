@@ -13,7 +13,7 @@ const router = express.Router();
 // Create post route
 router.post("/create", auth, async (req, res) => {
     try {
-        const {caption, visibility, imp, images } = req.body;
+        const { caption, visibility, imp, images } = req.body;
         const imageIds = [];
 
         if (images) {
@@ -74,9 +74,15 @@ router.get("/public-posts", auth, async (req, res) => {
         });
         let posts = null;
 
-        if (user.onlySeeImp)
+        if (user[0].onlySeeImp) {
             posts = await Post.find({ imp: true }).populate("images");
-        else posts = await Post.find().populate("images");
+        } else {
+            posts = await Post.find().populate("images");
+        }
+        posts.forEach(async (post) => {
+            const creator = await User.findOne({ _id: post.uid });
+            post.creator = creator.username;
+        });
         res.status(200).json(posts);
     } catch (error) {
         res.status(400).json({ message: error.message });
@@ -121,7 +127,7 @@ router.put("/:id", auth, async (req, res) => {
 });
 
 // Like a post route
-router.put("/like/:id", auth, async (req, res) => {
+router.get("/like/:id", auth, async (req, res) => {
     try {
         const postId = req.params.id;
         const userId = req.userId; // Assuming req.user contains the current user's information
