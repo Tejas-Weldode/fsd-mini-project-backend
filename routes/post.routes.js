@@ -43,21 +43,22 @@ router.post("/create", auth, async (req, res) => {
 router.get("/following-posts", auth, async (req, res) => {
     try {
         // if user wants only important posts
-        const onlySeeImp = await User.find({
-            _id: req.userId,
-            onlySeeImp: true,
-        });
-        const posts = null;
+        const user = await User.findById(req.userId);
+        let posts = null;
 
-        const following = await Network.find({ follower: currentUser._id });
+        const following = await Network.find({ follower: req.userId });
         const followingIds = following.map((e) => e.uid);
 
-        if (onlySeeImp)
+        if (user && user.onlySeeImp)
             posts = await Post.find({
                 imp: true,
                 uid: { $in: followingIds },
-            }).populate("images");
-        else posts = await Post.find().populate("images");
+            }).populate("uid");
+        else
+            posts = await Post.find({
+                uid: { $in: followingIds },
+            }).populate("uid");
+        console.log(posts);
         res.status(200).json(posts);
     } catch (error) {
         res.status(400).json({ message: error.message });
@@ -68,21 +69,15 @@ router.get("/following-posts", auth, async (req, res) => {
 router.get("/public-posts", auth, async (req, res) => {
     try {
         // if user wants only important posts
-        const user = await User.find({
-            _id: req.userId,
-            onlySeeImp: true,
-        });
+        const user = await User.findById(req.userId);
+        console.log("userId --> ", req.userId);
         let posts = null;
 
-        if (user[0].onlySeeImp) {
-            posts = await Post.find({ imp: true }).populate("images");
+        if (user && user.onlySeeImp) {
+            posts = await Post.find({ imp: true }).populate("uid");
         } else {
-            posts = await Post.find().populate("images");
+            posts = await Post.find().populate("uid");
         }
-        posts.forEach(async (post) => {
-            const creator = await User.findOne({ _id: post.uid });
-            post.creator = creator.username;
-        });
         res.status(200).json(posts);
     } catch (error) {
         res.status(400).json({ message: error.message });

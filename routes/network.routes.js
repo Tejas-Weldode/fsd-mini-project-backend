@@ -4,6 +4,26 @@ import auth from "../middlewares/auth.js";
 
 const router = express.Router();
 
+// toggle follow-unfollow
+router.post("/follow-unfollow", auth, async (req, res) => {
+    try {
+        const { uid } = req.body;
+        const follower = req.userId;
+        const existingNetwork = await Network.findOne({ uid, follower });
+        if (existingNetwork) {
+            await Network.findByIdAndDelete(existingNetwork._id);
+            return res
+                .status(201)
+                .json({ message: "User unfollowed successfully" });
+        }
+        const network = new Network({ uid, follower });
+        await network.save();
+        res.status(201).json({ message: "User followed successfully" });
+    } catch (error) {
+        res.status(400).json({ message: error.message });
+    }
+});
+
 // Follow user route
 router.post("/follow", auth, async (req, res) => {
     try {
